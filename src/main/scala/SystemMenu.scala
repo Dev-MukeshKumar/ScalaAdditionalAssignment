@@ -1,24 +1,37 @@
-import generate._
+import generateData._
 import models._
 import operations._
-
 import scala.annotation.tailrec
-import scala.io.StdIn.readInt
-import scala.io.StdIn.readLine
-import scala.util.{Failure, Success, Try}
+import scala.io.StdIn.{readInt, readLine}
+import scala.util.{Success, Try}
 
 object SystemMenu extends App{
 
-  DataStore.employees foreach println
+  //display employee details
+  println("---------------------------------Employees Data---------------------------------------")
+  InMemoryData.employees foreach println
+  println
+
+  //display department details
+  println("---------------------------------Departments Data---------------------------------------")
+  InMemoryData.departments foreach println
+  println
+
+  //display project details
+  println("---------------------------------Projects Data---------------------------------------")
+  InMemoryData.projects foreach println
+  println
+
+  waitForPressingEnter()
 
   menu()
 
   @tailrec
   def menu(
             choice:Try[Option[Int]] = Success(None),
-            employees: List[Employee] = DataStore.employees,
-            departments: Map[Int,Department] = DataStore.departments,
-            projects: Map[Int,Project] = DataStore.projects
+            employees: List[Employee] = InMemoryData.employees,
+            departments: Map[Int,Department] = InMemoryData.departments,
+            projects: Map[Int,Project] = InMemoryData.projects
           ):Any =
   {
     choice match {
@@ -58,5 +71,10 @@ object SystemMenu extends App{
         menu(choice = Success(None))
       }
     }
+  }
+
+  def waitForPressingEnter(): Unit = {
+    println("\npress enter to continue.")
+    readLine()
   }
 }
