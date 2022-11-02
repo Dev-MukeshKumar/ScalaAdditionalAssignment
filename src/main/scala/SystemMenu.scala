@@ -31,7 +31,8 @@ object SystemMenu extends App{
             choice:Try[Option[Int]] = Success(None),
             employees: List[Employee] = InMemoryData.employees,
             departments: Map[Int,Department] = InMemoryData.departments,
-            projects: Map[Int,Project] = InMemoryData.projects
+            projects: Map[Int,Project] = InMemoryData.projects,
+            employeesWithRole: List[EmployeeWithRole] = List.empty[EmployeeWithRole]
           ):Any =
   {
     choice match {
@@ -45,7 +46,7 @@ object SystemMenu extends App{
         println("6. Get employees based on DOJ")
         println("7. Increment salary by 10% for department 3 and 5")
         println("8. List senior and highly paid employees")
-        println("9. Average salary of employee in a particular project")
+        println("9. Average salary of employees in a particular project")
         println("10. Display Roles of employee")
         println("\nNote: enter -1 to exit application!")
         println("----------------------------------------------------------------------------------")
@@ -60,15 +61,15 @@ object SystemMenu extends App{
         println("Please refer the menu and enter a valid operation number!")
         println("\npress enter to continue.")
         readLine()
-        menu(choice=Success(None),employees,departments,projects)
+        menu(choice=Success(None),employees,departments,projects,employeesWithRole)
       }
       case Success(Some(value)) if value >=1 && value <= 10 => {
-        val (a,b,c) = OperationMapper.callRespectiveOperation(value,employees,departments,projects)
-        menu(Success(None),a,b,c)
+        val (a,b,c,d) = OperationMapper.callRespectiveOperation(value,employees,departments,projects,employeesWithRole)
+        menu(Success(None),a,b,c,d)
       }
       case _ => {
         println("Enter a valid number!")
-        menu(choice = Success(None))
+        menu(choice = Success(None),employees,departments,projects,employeesWithRole)
       }
     }
   }

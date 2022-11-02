@@ -2,6 +2,8 @@ package generateData
 
 import models._
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import scala.annotation.tailrec
 import scala.util.Random
@@ -19,15 +21,22 @@ object InMemoryData {
   val projects = List.range(1001, 1011).map(x => (x,Project(x, "Project-" + x))).toMap
   val departments = List.range(1,11).map(x => (x,Department(x,departmentNames(x-1),1000+x))).toMap
 
-  val employees = List.range(0,100).map(x=> Employee(
+  val employees = List.range(0,101).map(x=> Employee(
     UUID.randomUUID(),
     randomName(6).capitalize,
-    Option(s"01/01/201${if((x/10).toInt!=10) (x/10).toInt else 9}"),
+    generateDate(x),
     2000*(20+Random.nextInt(26)),
     1+Random.nextInt(10),
     Address(1000+Random.nextInt(1001),s"Area-$x",Option(statesName(0+Random.nextInt(28))),110000+(1000+Random.nextInt(1001))),
     s"+91 ${1000+Random.nextInt(9000)}-${10000+Random.nextInt(90000)}")
   )
+
+  //helper methods in generating data
+  def generateDate(x:Int): Option[LocalDate] ={
+    val date = s"01/01/201${if((x/10)!=10) (x/10) else 9}"
+    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+    Option(LocalDate.parse(date,formatter))
+  }
 
   @tailrec
   def randomName(n:Int,acc:String=""): String ={
