@@ -91,7 +91,7 @@ object OperationMapper {
       else{
         val a = Operation7.incrementSalaryBy10PercentForTwoDepartments(employees)
         println("---------------------------------Employees Data---------------------------------------")
-        a foreach println
+        a.foreach(employee => println(employee.name+" - "+employee.salary))
         waitForPressingEnter()
         (a, departments, projects,employeesWithRole)
       }
