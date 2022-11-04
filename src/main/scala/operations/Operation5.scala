@@ -10,8 +10,18 @@ import scala.io.StdIn.{readInt, readLine}
 import scala.util.{Failure, Random, Success, Try}
 
 object Operation5 {
-  def addNewEmployee(employees: List[Employee], departments:Map[Int,Department]): List[Employee] = {
-    employees :+ Employee(UUID.randomUUID(),getEmployeeName(),getDoj(),getSalary(),getRandomDepartment(departments),getAddress(),getPhoneNumber())
+  def addNewEmployee(
+                      employees: List[Employee],
+                      departments:Map[Int,Department],
+                      id:UUID =UUID.randomUUID(),
+                      name:String =getEmployeeName(),
+                      doj:Option[LocalDate] = getDoj(),
+                      salary:Int = getSalary(),
+                      address: Address = getAddress(),
+                      phoneNumber:String = getPhoneNumber()
+                    ): List[Employee] = {
+    val departmentId = getRandomDepartment(departments)
+    employees :+ Employee(id, name,doj,salary,departmentId,address,phoneNumber)
   }
 
   //employee details getters
@@ -28,7 +38,7 @@ object Operation5 {
 
   @tailrec
   def getDoj(): Option[LocalDate] = {
-    print("Date of joining(dd/mm/yyyy): ")
+    print("Date of joining(dd/mm/yyyy)\n(Optional input, to skip press enter): ")
     val dateOfJoining = readLine()
     (isValidDate(dateOfJoining),dateOfJoining) match {
       case (false,"") => None
@@ -37,18 +47,19 @@ object Operation5 {
         getDoj()
       }
       case (true,value) => {
-        val year = value.split("/")(2).toInt
-        val currentYear = LocalDate.now().getYear
-        if( year < 2010) {
+        val defaultDate = LocalDate.parse("1/1/2010",DateTimeFormatter.ofPattern("d/M/yyyy"))
+        val inputDate = LocalDate.parse(value,DateTimeFormatter.ofPattern("d/M/yyyy"))
+        val currentDate = LocalDate.now()
+        if( inputDate.isBefore(defaultDate) ) {
           println("please enter date after the year 2009!")
           getDoj()
         }
-        else if(year > currentYear) {
+        else if(inputDate.isAfter(currentDate)) {
           println("please enter possible date of joining not future date!")
           getDoj()
         }
         else {
-          Option(LocalDate.parse(value,DateTimeFormatter.ofPattern("d/M/yyyy")))
+          Option(inputDate)
         }
       }
     }
@@ -75,11 +86,11 @@ object Operation5 {
 
   @tailrec
   def getPhoneNumber(): String = {
-    print("Phone number (+91 xxxx-yyyyy): ")
+    print("Phone number (+91 xxxx-yyyyyy): ")
     val phoneNumber = readLine()
-    if (phoneNumber.matches("^(\\+91)\\s([1-9][0-9]{3})-([0-9]{5})$")) phoneNumber
+    if (phoneNumber.matches("^(\\+91)\\s([1-9][0-9]{3})-([0-9]{6})$")) phoneNumber
     else {
-      println("Please follow the format +91 xxxx-yyyyy")
+      println("Please follow the format +91 xxxx-yyyyyy")
       getPhoneNumber()
     }
   }
@@ -117,7 +128,7 @@ object Operation5 {
 
   @tailrec
   def getStateName(): Option[String] = {
-    print("State: ")
+    print("State\n(Optional input, to skip press enter):")
     val stateName = Option(readLine())
     stateName match {
       case Some(value) if value.trim == "" => None

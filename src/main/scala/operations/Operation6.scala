@@ -10,20 +10,9 @@ import scala.util.{Success, Try}
 
 object Operation6 {
 
-  @tailrec
-  def displayEmployeeByDoj(employees:List[Employee]): Unit = {
-    val date = getDateInput()
+  def getEmployeeByDoj(employees:List[Employee], date:LocalDate = getDateInput()): List[Employee] = {
     val defaultDate = LocalDate.parse("01/01/2010",DateTimeFormatter.ofPattern("d/M/yyyy"))
-
-    val filteredEmployeeList = employees.filter(employee => dateGreaterThanOrEqual(employee.doj.getOrElse(defaultDate),date))
-
-    if(filteredEmployeeList.isEmpty) {
-      println(s"No employees are found, please enter a date prior to ${date.format(DateTimeFormatter.ofPattern("d/M/yyyy"))}!")
-      displayEmployeeByDoj(employees)
-    } else {
-      println("\n---------------------------------Employees Data---------------------------------------")
-      filteredEmployeeList.foreach(employee => println(employee.id +" - "+ employee.name))
-    }
+    employees.filter(employee => dateGreaterThanOrEqual(employee.doj.getOrElse(defaultDate),date))
   }
 
   //helper methods

@@ -14,14 +14,14 @@ object Operation10 {
 
   def getRole(doj:LocalDate):String = {
 
-    //calculating years of experience
-    val years = (LocalDate.now().toEpochDay() - doj.toEpochDay()) / 365
-
-    if(years<=1) "Junior analyst"
-    else if(years>1 && years<=3) "Analyst"
-    else if(years>3 && years<=5) "Senior analyst"
-    else if(years>5 && years<=7) "Lead analyst"
-    else "Chief analyst"
+    //calculating years of experience and deciding role
+    (LocalDate.now().toEpochDay() - doj.toEpochDay()) / 365 match {
+      case years if years <=1 => "Junior analyst"
+      case years if(years>1 && years<=3) =>  "Analyst"
+      case years if(years>3 && years<=5) => "Senior analyst"
+      case years if(years>5 && years<=7) => "Lead analyst"
+      case _ => "Chief analyst"
+    }
   }
 
 }

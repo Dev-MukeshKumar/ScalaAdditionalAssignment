@@ -5,28 +5,27 @@ import models._
 import scala.annotation.tailrec
 
 object Operation9 {
-  def getAverageSalaryOnProject(projectId: Int, employees:List[Employee], departments:Map[Int,Department], projects:Map[Int,Project]):Unit = {
-    if(!projects.contains(projectId)) println(s"Project with Id:${projectId} does not exists!")
+  def getAverageSalaryOnProject(projectId: Int, employees:List[Employee], departments:Map[Int,Department], projects:Map[Int,Project]):Int = {
+    if(!projects.contains(projectId)) -1
     else {
-      val departmentId = getDepartmentIdByproductId(projectId,departments.values.toList)
+      val departmentId = getDepartmentIdByProjectId(projectId,departments.values.toList)
       departmentId match {
         case Some(value) => {
           val employeesList = getEmployeesByDepartmentId(value,employees)
-          if(employeesList.isEmpty) println(s"There are no employees working under this department with Id: ${value}")
+          if(employeesList.isEmpty) 0
           else{
-            val averageSalary = getSalarySum(employeesList) / employeesList.length
-            println(s"The average salary under the project with Id:${projectId} is ${averageSalary}")
+            getSalarySum(employeesList) / employeesList.length
           }
         }
-        case None => println(s"No department is working under this project with Id: ${projectId}")
+        case None => 0
       }
     }
   }
 
   @tailrec
-  def getDepartmentIdByproductId(projectId:Int, departments: List[Department]):Option[Int] = departments match {
-      case departments if departments.head.projectId == projectId => Some(departments.head.id)
-      case departments if !departments.tail.isEmpty => getDepartmentIdByproductId(projectId,departments.tail)
+  def getDepartmentIdByProjectId(projectId:Int, departments: List[Department]):Option[Int] = departments match {
+      case departments if departments.head.projectId.contains(projectId) => Some(departments.head.id)
+      case departments if departments.tail.nonEmpty => getDepartmentIdByProjectId(projectId,departments.tail)
       case _ => None
   }
 

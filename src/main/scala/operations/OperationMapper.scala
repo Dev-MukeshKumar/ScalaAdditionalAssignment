@@ -15,7 +15,14 @@ object OperationMapper {
       val projectId = Try(readInt())
       projectId match {
         case Success(value) => {
-          Operation1.getProjectMembers(employees, departments, projects, value)
+          val listOfEmployees = Operation1.getProjectMembers(employees, departments, projects, value) match {
+            case Some(value) if value.nonEmpty => {
+              println("-----Employee names-----")
+              value.foreach(x => println(x.name))
+            }
+            case Some(value) if value.isEmpty => println("No employees are currently working under this project.")
+            case _ => println(s"Project with Id: ${projectId.get} does not exists!")
+          }
           waitForPressingEnter()
           (employees, departments, projects,employeesWithRole)
         }
@@ -37,9 +44,9 @@ object OperationMapper {
       val projectId = Try(readInt())
       projectId match {
         case Success(value) =>{
-          val (a,b) = Operation3.deleteProject(value, departments, projects)
+          val (modifiedDepartments,modifiedProjects) = Operation3.deleteProject(value, departments, projects)
           waitForPressingEnter()
-          (employees, a, b,employeesWithRole)
+          (employees,modifiedDepartments,modifiedProjects,employeesWithRole)
         }
         case Failure(value) =>{
           println("Please enter a valid project id!")
@@ -53,9 +60,9 @@ object OperationMapper {
       val departmentId = Try(readInt())
       departmentId match {
         case Success(value) => {
-          val (a, b, c) = Operation4.deleteDepartment(value, employees,departments,employeesWithRole)
+          val (modifiedEmployees, modifiedDepartments, modifiedEmployeesWithRole) = Operation4.deleteDepartment(value, employees,departments,employeesWithRole)
           waitForPressingEnter()
-          (a,b,projects,c)
+          (modifiedEmployees,modifiedDepartments,projects,modifiedEmployeesWithRole)
         }
         case Failure(value) => {
           println("Please enter a valid department id!")
@@ -65,16 +72,23 @@ object OperationMapper {
     }
 
     case 5 => {
-      val a = Operation5.addNewEmployee(employees, departments)
-      println("Employee with following details added successfully: "+a(a.length-1))
+      val modifiedEmployees = Operation5.addNewEmployee(employees, departments)
+      println("Employee with following details added successfully: "+modifiedEmployees.last)
       waitForPressingEnter()
-      (a, departments, projects,employeesWithRole)
+      (modifiedEmployees, departments, projects,employeesWithRole)
     }
 
     case 6 => {
-      Operation6.displayEmployeeByDoj(employees)
-      waitForPressingEnter()
-      (employees, departments, projects, employeesWithRole)
+      val filteredEmployeeList = Operation6.getEmployeeByDoj(employees)
+      if (filteredEmployeeList.isEmpty) {
+        println(s"No employees are found, please enter a date prior!")
+        OperationMapper.callRespectiveOperation(6, employees, departments, projects,employeesWithRole)
+      } else {
+        println("\n---------------------------------Employees Data---------------------------------------")
+        filteredEmployeeList.foreach(employee => println(employee.id + " - " + employee.name))
+        waitForPressingEnter()
+        (employees, departments, projects, employeesWithRole)
+      }
     }
 
     case 7 => {
@@ -89,11 +103,11 @@ object OperationMapper {
         (employees, departments, projects,employeesWithRole)
       }
       else{
-        val a = Operation7.incrementSalaryBy10PercentForTwoDepartments(employees)
+        val modifiedEmployees = Operation7.incrementSalaryBy10PercentForTwoDepartments(employees)
         println("---------------------------------Employees Data---------------------------------------")
-        a.foreach(employee => println(employee.name+" - "+employee.salary))
+        modifiedEmployees.foreach(employee => println(employee.name+" - "+employee.salary))
         waitForPressingEnter()
-        (a, departments, projects,employeesWithRole)
+        (modifiedEmployees, departments, projects,employeesWithRole)
       }
     }
 
@@ -109,7 +123,12 @@ object OperationMapper {
       val projectId = Try(readInt())
       projectId match {
         case Success(value) => {
-          Operation9.getAverageSalaryOnProject(value, employees, departments, projects)
+          val averageSalary = Operation9.getAverageSalaryOnProject(value, employees, departments, projects)
+          averageSalary match {
+            case -1 => println(s"Project with Id: ${value} does not exists")
+            case 0 => println("Currently the project is not having members!")
+            case _ => println(s"The project with Id: ${value} have the average salary: ${averageSalary}.")
+          }
           waitForPressingEnter()
           (employees,departments,projects,employeesWithRole)
         }
@@ -121,12 +140,14 @@ object OperationMapper {
     }
 
     case 10 => {
-      val a = Operation10.getEmployeesWithRole(employees)
+      val modifiedEmployeesWithRole = Operation10.getEmployeesWithRole(employees)
       println("---------------------------------Employees Data with roles---------------------------------------")
-      a foreach println
+      modifiedEmployeesWithRole foreach println
       waitForPressingEnter()
-      (employees, departments, projects, a)
+      (employees, departments, projects, modifiedEmployeesWithRole)
     }
+
+    case 11 => (employees, departments, projects, employeesWithRole)
 
 //    case _ if List.range(1, 11).contains(n.toInt) => {
 //      println("Not implemented yet, please try later!")
@@ -145,4 +166,6 @@ object OperationMapper {
     println("\npress enter to continue.")
     readLine()
   }
+
+
 }

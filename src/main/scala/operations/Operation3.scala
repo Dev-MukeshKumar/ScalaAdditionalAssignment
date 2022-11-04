@@ -11,8 +11,8 @@ object Operation3 {
     else {
       println(s"Project with id:${projectId} deleted! and update in the respective department!")
       (departments.map(x =>
-        if(x._2.projectId == projectId)
-          (x._1,Department(x._1,x._2.name,0))
+        if(x._2.projectId.contains(projectId))
+          (x._1,Department(x._1,x._2.name,None))
         else x
       ),
       projects.filter(x => x._1 != projectId))
